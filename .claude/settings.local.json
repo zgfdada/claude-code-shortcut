@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(cmd /c \"echo %APPDATA%\")",
+      "Bash(powershell -Command \"[Environment]::GetFolderPath\\('ApplicationData'\\)\")",
+      "Bash(powershell -Command \"Remove-Item -Recurse -Force '$env:APPDATA\\\\claude-code-shortcut' -ErrorAction SilentlyContinue; Write-Host 'Done'\")",
+      "Bash(powershell -Command \"Get-Content '$env:APPDATA\\\\claude-code-shortcut\\\\logs\\\\main.log' -ErrorAction SilentlyContinue; Get-ChildItem '$env:APPDATA\\\\claude-code-shortcut' -Recurse -ErrorAction SilentlyContinue\")",
+      "Bash(powershell -Command \"Get-ChildItem -Path $env:APPDATA -Filter 'claude*' -Recurse -ErrorAction SilentlyContinue | Select-Object FullName\")",
+      "Bash(powershell -Command \"Start-Process ''''C:\\\\Github\\\\claude-code-shortcut\\\\release\\\\win-unpacked\\\\Claude Code Shortcut.exe''''\")",
+      "Bash(powershell -Command \"Stop-Process -Name 'Claude Code Shortcut' -ErrorAction SilentlyContinue\")",
+      "Bash(powershell -Command \"\nAdd-Type -AssemblyName System.Data.SQLite -ErrorAction SilentlyContinue\n\\\\$bytes = [System.IO.File]::ReadAllBytes\\('C:\\\\Github\\\\claude-code-shortcut\\\\release\\\\win-unpacked\\\\data.db'\\)\nWrite-Host \\('data.db size: ' + \\\\$bytes.Length + ' bytes'\\)\n\")",
+      "Bash(powershell -Command \"Compress-Archive -Path 'C:\\\\Github\\\\claude-code-shortcut\\\\release\\\\win-unpacked\\\\*' -DestinationPath 'C:\\\\Github\\\\claude-code-shortcut\\\\release\\\\Claude Code Shortcut.zip' -Force; Write-Host 'Done'\")",
+      "Bash(powershell -Command \"\\(Get-Item 'C:\\\\Github\\\\claude-code-shortcut\\\\release\\\\Claude Code Shortcut.zip'\\).Length / 1MB\")"
+    ]
+  }
+}
