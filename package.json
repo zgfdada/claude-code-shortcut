@@ -45,7 +45,8 @@
       "dist/**/*",
       "dist-electron/**/*",
       "node_modules/sql.js/dist/sql-wasm.wasm",
-      "node_modules/koffi/**/*"
+      "node_modules/koffi/**/*",
+      "data.db"
     ],
     "extraResources": [
       {
