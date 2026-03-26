@@ -6,9 +6,9 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "outDir": "dist-electron",
+    "outDir": "../../code/build/dist-electron",
     "declaration": true,
     "declarationMap": true
   },
-  "include": ["vite.config.ts", "electron/**/*"]
+  "include": ["vite.config.ts", "../electron/**/*"]
 }

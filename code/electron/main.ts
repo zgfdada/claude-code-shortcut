@@ -87,7 +87,7 @@ function createWindow(): BrowserWindow {
     // 开发模式下打开 DevTools
     // mainWindow.webContents.openDevTools({ mode: 'detach' });
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    mainWindow.loadFile(path.join(__dirname, '../dist/code/build/index.html'));
   }
 
   // 窗口准备好后显示

@@ -4,7 +4,10 @@ import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import path from 'path'
 
+const rootDir = path.join(__dirname, '../..')
+
 export default defineConfig({
+  root: rootDir,
   plugins: [
     react(),
     electron([
@@ -12,7 +15,7 @@ export default defineConfig({
         entry: 'code/electron/main.ts',
         vite: {
           build: {
-            outDir: 'dist-electron',
+            outDir: 'code/build/dist-electron',
             rollupOptions: {
               external: ['sql.js', 'electron', 'koffi']
             }
@@ -26,7 +29,7 @@ export default defineConfig({
         },
         vite: {
           build: {
-            outDir: 'dist-electron'
+            outDir: 'code/build/dist-electron'
           }
         }
       }
@@ -35,10 +38,15 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './code/src')
+      '@': path.resolve(rootDir, 'code/src')
     }
   },
+  base: './',
   build: {
-    outDir: 'dist'
+    outDir: 'code/build/dist',
+    emptyOutDir: true,
+    rollupOptions: {
+      input: path.join(rootDir, 'code/build/index.html')
+    }
   }
 })

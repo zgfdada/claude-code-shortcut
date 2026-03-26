@@ -6,9 +6,10 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const root = path.join(__dirname, '..');
+const root = path.join(__dirname, '../..');
 const releaseDb = path.join(root, 'release', 'win-unpacked', 'data.db');
 const projectDb = path.join(root, 'data.db');
+const viteConfig = path.join(__dirname, 'vite.config.ts');
 
 // 构建前：把 release 里的用户数据库备份到项目根目录
 if (fs.existsSync(releaseDb)) {
@@ -21,4 +22,4 @@ if (fs.existsSync(releaseDb)) {
 }
 
 // 执行正式构建
-execSync('npx vite build && npx electron-builder', { stdio: 'inherit', cwd: root });
+execSync(`npx vite build --config "${viteConfig}" && npx electron-builder`, { stdio: 'inherit', cwd: root });
