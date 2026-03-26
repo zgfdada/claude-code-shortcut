@@ -14,7 +14,7 @@ export default defineConfig({
           build: {
             outDir: 'dist-electron',
             rollupOptions: {
-              external: ['sql.js', 'electron']
+              external: ['sql.js', 'electron', 'koffi']
             }
           }
         }

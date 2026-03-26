@@ -156,8 +156,35 @@ export function searchCommands(query: string): Command[] {
 }
 
 export function incrementUsage(id: string): void {
-  db.run(`UPDATE commands SET usage_count = usage_count + 1, updated_at = ? WHERE id = ?`, [Date.now(), id]);
+  log.info(`[Database] incrementUsage 开始执行，id=${id}`);
+
+  // 先查询当前值
+  const beforeStmt = db.prepare('SELECT usage_count FROM commands WHERE id = ?');
+  beforeStmt.bind([id]);
+  let beforeCount: number | null = null;
+  if (beforeStmt.step()) {
+    const row = beforeStmt.get();
+    beforeCount = row[0] as number;
+  }
+  beforeStmt.free();
+  log.info(`[Database] 更新前 usage_count=${beforeCount}`);
+
+  // 执行更新
+  const result = db.run(`UPDATE commands SET usage_count = usage_count + 1, updated_at = ? WHERE id = ?`, [Date.now(), id]);
+  log.info(`[Database] UPDATE 执行结果，changes=${result.changes}`);
+
   saveDatabase();
+
+  // 查询更新后的值
+  const afterStmt = db.prepare('SELECT usage_count FROM commands WHERE id = ?');
+  afterStmt.bind([id]);
+  let afterCount: number | null = null;
+  if (afterStmt.step()) {
+    const row = afterStmt.get();
+    afterCount = row[0] as number;
+  }
+  afterStmt.free();
+  log.info(`[Database] 更新后 usage_count=${afterCount}`);
 }
 
 export function toggleFavorite(id: string): Command {

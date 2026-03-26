@@ -4,6 +4,7 @@ import log from 'electron-log';
 import { initDatabase, getSettings, saveSettings, setDbDir } from './database';
 import { registerCommandsHandlers } from './ipc/commands';
 import { registerSettingsHandlers } from './ipc/settings';
+import { registerTerminalHandlers } from './ipc/terminal';
 import { createTray, destroyTray } from './tray';
 import { registerGlobalShortcut, unregisterAllShortcuts } from './globalShortcut';
 
@@ -160,6 +161,7 @@ app.whenReady().then(async () => {
     // 注册 IPC 处理器
     registerCommandsHandlers();
     registerSettingsHandlers();
+    registerTerminalHandlers();
     registerWindowHandlers();
 
     // 创建窗口

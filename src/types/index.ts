@@ -50,6 +50,8 @@ export interface ElectronAPI {
   onThemeUpdate: (callback: (settings: Settings) => void) => void;
   logInfo: (message: string) => Promise<void>;
   logError: (message: string, error?: unknown) => Promise<void>;
+  listCmdWindows: () => Promise<{ hwnd: string; title: string }[]>;
+  sendToTerminal: (hwnd: string, text: string) => Promise<void>;
 }
 
 declare global {

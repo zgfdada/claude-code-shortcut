@@ -5,9 +5,11 @@ import { StatusBar } from './components/StatusBar';
 import { LatestCommandBar } from './components/LatestCommandBar';
 import { CategoryFilter } from './components/CategoryFilter';
 import { SettingsPanel } from './components/SettingsPanel';
+import { TerminalPicker } from './components/TerminalPicker';
 import { useCommands } from './hooks/useCommands';
 import { useSettings } from './hooks/useSettings';
 import { useSearch } from './hooks/useSearch';
+import { useTerminal } from './hooks/useTerminal';
 
 function App() {
   const [showSettings, setShowSettings] = useState(false);
@@ -22,6 +24,27 @@ function App() {
     updateCommand,
   } = useCommands();
   const { settings, saveSettings, resetSettings } = useSettings();
+  const { boundHwnd, boundTitle, windows, showPicker, setShowPicker, openPicker, bindWindow, unbind, sendText } = useTerminal();
+
+  // 发送到终端：先发文本，再无条件记录使用次数
+  const handleSendToTerminal = useCallback(async (id: string, text: string) => {
+    void window.electronAPI.logInfo(`[发送] 开始: id=${id} text="${text}"`);
+    try {
+      await sendText(text);
+      void window.electronAPI.logInfo(`[发送] sendText 完成`);
+    } catch (err) {
+      void window.electronAPI.logError(`[发送] sendText 失败`, err);
+    }
+    // 无论发送成功与否，用户已点击发送，记录使用次数
+    try {
+      await window.electronAPI.incrementUsage(id);
+      void window.electronAPI.logInfo(`[发送] incrementUsage 完成: id=${id}`);
+    } catch (err) {
+      void window.electronAPI.logError(`[发送] incrementUsage 失败`, err);
+    }
+    await loadCommands();
+    void window.electronAPI.logInfo(`[发送] loadCommands 刷新完成`);
+  }, [sendText, loadCommands]);
 
   const handleSearch = useCallback(async (query: string) => {
     await searchCommands(query);
@@ -61,6 +84,13 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'x') {
+        // Ctrl+X: 完全退出进程
+        e.preventDefault();
+        e.stopPropagation();
+        window.electronAPI.closeWindow();
+        return;
+      }
       if (e.key === 'Escape') {
         if (showSettings) {
           setShowSettings(false);
@@ -95,6 +125,23 @@ function App() {
           Claude Code Shortcut
         </span>
         <div className="flex items-center gap-1" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
+          {/* 终端绑定按钮 */}
+          <button
+            onClick={boundHwnd ? unbind : openPicker}
+            className="px-2 py-0.5 rounded text-xs transition-all duration-150 cursor-pointer"
+            style={{
+              color: boundHwnd ? settings.theme.accentColor : `${settings.theme.textColor}55`,
+              backgroundColor: boundHwnd ? `${settings.theme.accentColor}22` : 'transparent',
+              border: `1px solid ${boundHwnd ? settings.theme.accentColor : `${settings.theme.textColor}22`}`,
+              maxWidth: '120px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+            title={boundHwnd ? `已绑定：${boundTitle}，点击解绑` : '绑定 CMD 终端'}
+          >
+            {boundHwnd ? `⬡ ${boundTitle}` : '绑定终端'}
+          </button>
           <button
             onClick={() => window.electronAPI.hideWindow()}
             className="w-5 h-5 rounded flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity"
@@ -141,6 +188,7 @@ function App() {
             onToggleFavorite={toggleFavorite}
             onDelete={deleteCommand}
             onUpdate={updateCommand}
+            onSendToTerminal={boundHwnd ? handleSendToTerminal : undefined}
           />
         )}
       </div>
@@ -152,10 +200,20 @@ function App() {
           onToggleFavorite={toggleFavorite}
           onDelete={deleteCommand}
           onUpdate={updateCommand}
+          onSendToTerminal={boundHwnd ? handleSendToTerminal : undefined}
         />
       )}
 
       <StatusBar commandCount={filteredCommands.length} />
+
+      {showPicker && (
+        <TerminalPicker
+          windows={windows}
+          onBind={bindWindow}
+          onClose={() => setShowPicker(false)}
+          onRefresh={openPicker}
+        />
+      )}
 
       {showSettings && (
         <SettingsPanel

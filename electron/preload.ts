@@ -30,6 +30,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     });
   },
 
+  // 终端绑定
+  listCmdWindows: (): Promise<{ hwnd: string; title: string }[]> => ipcRenderer.invoke('terminal:list'),
+  sendToTerminal: (hwnd: string, text: string): Promise<void> => ipcRenderer.invoke('terminal:send', hwnd, text),
+
   // 日志（写入主进程 app.log）
   logInfo: (message: string): Promise<void> => ipcRenderer.invoke('renderer:log-info', message),
   logError: (message: string, error?: unknown): Promise<void> => ipcRenderer.invoke('renderer:log-error', message, error),

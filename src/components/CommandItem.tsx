@@ -9,6 +9,7 @@ interface CommandItemProps {
   onToggleFavorite: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, updates: Partial<Command>) => Promise<void>;
+  onSendToTerminal?: (id: string, text: string) => Promise<void>;
 }
 
 export function CommandItem({
@@ -18,6 +19,7 @@ export function CommandItem({
   onToggleFavorite,
   onDelete,
   onUpdate,
+  onSendToTerminal,
 }: CommandItemProps) {
   const { settings } = useSettings();
   const [copied, setCopied] = useState(false);
@@ -205,6 +207,16 @@ export function CommandItem({
             >
               编辑
             </button>
+            {onSendToTerminal && (
+              <button
+                onClick={() => void onSendToTerminal(command.id, command.command)}
+                className="px-3 py-1 rounded text-xs font-medium transition-all duration-200 cursor-pointer"
+                style={{ backgroundColor: `${accentColor}33`, color: accentColor, border: `1px solid ${accentColor}66` }}
+                title="发送到终端"
+              >
+                发送
+              </button>
+            )}
             <button
               onClick={handleCopy}
               className="px-3 py-1 rounded text-xs font-medium transition-all duration-200 cursor-pointer"

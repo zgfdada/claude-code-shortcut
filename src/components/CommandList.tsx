@@ -9,9 +9,10 @@ interface CommandListProps {
   onToggleFavorite: (id: string) => void;
   onDelete: (id: string) => void;
   onUpdate: (id: string, updates: Partial<Command>) => Promise<void>;
+  onSendToTerminal?: (id: string, text: string) => Promise<void>;
 }
 
-export function CommandList({ commands, onCopy, onToggleFavorite, onDelete, onUpdate }: CommandListProps) {
+export function CommandList({ commands, onCopy, onToggleFavorite, onDelete, onUpdate, onSendToTerminal }: CommandListProps) {
   const { settings } = useSettings();
 
   if (commands.length === 0) {
@@ -51,6 +52,7 @@ export function CommandList({ commands, onCopy, onToggleFavorite, onDelete, onUp
           onToggleFavorite={onToggleFavorite}
           onDelete={onDelete}
           onUpdate={onUpdate}
+          onSendToTerminal={onSendToTerminal}
         />
       ))}
     </div>

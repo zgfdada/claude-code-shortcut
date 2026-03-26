@@ -44,6 +44,19 @@ export function StatusBar({ commandCount }: StatusBarProps) {
         </kbd>
         {' '}隐藏
       </span>
+      <span style={{ color: `${accentColor}44` }}>|</span>
+      <span>
+        <kbd
+          className="px-1.5 py-0.5 rounded text-xs font-mono"
+          style={{
+            backgroundColor: `${accentColor}22`,
+            color: accentColor,
+          }}
+        >
+          Ctrl+X
+        </kbd>
+        {' '}退出
+      </span>
     </div>
   );
 }

@@ -23,10 +23,13 @@ export function registerCommandsHandlers(): void {
   });
 
   ipcMain.handle('commands:incrementUsage', async (_event, id: string) => {
+    log.info(`[IPC] incrementUsage 被调用，id=${id}`);
     try {
       db.incrementUsage(id);
+      log.info(`[IPC] incrementUsage 成功完成，id=${id}`);
     } catch (error) {
-      log.error('Failed to increment usage:', error);
+      log.error(`[IPC] incrementUsage 失败，id=${id}:`, error);
+      throw error;
     }
   });
 
