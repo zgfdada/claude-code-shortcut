@@ -12,6 +12,7 @@ const GetWindowTextW = user32.func('int GetWindowTextW(void* hWnd, char16_t* lpW
 const IsWindowVisible = user32.func('bool IsWindowVisible(void* hWnd)');
 const SetForegroundWindow = user32.func('bool SetForegroundWindow(void* hWnd)');
 const SendInput = user32.func('uint32 SendInput(uint32 nInputs, void* pInputs, int cbSize)');
+const IsWindow = user32.func('bool IsWindow(void* hWnd)');
 
 const KEYEVENTF_UNICODE = 0x0004;
 const KEYEVENTF_KEYUP = 0x0002;
@@ -82,8 +83,23 @@ export function enumCmdWindows(): CmdWindow[] {
   return results;
 }
 
+export function isWindowValid(hwnd: object): boolean {
+  try {
+    return IsWindow(hwnd) as boolean;
+  } catch (error) {
+    log.error('[winApi] IsWindow 检查失败:', error);
+    return false;
+  }
+}
+
 export function sendTextToCmd(hwnd: object, text: string): void {
   log.info(`[winApi] 发送到终端: "${text}"`);
+
+  // 检查窗口是否仍然有效
+  if (!isWindowValid(hwnd)) {
+    log.error('[winApi] 终端窗口已关闭，无法发送文本');
+    throw new Error('终端窗口已关闭');
+  }
 
   if (!SetForegroundWindow(hwnd)) {
     log.warn('[winApi] SetForegroundWindow returned false');

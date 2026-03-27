@@ -52,6 +52,9 @@ export interface ElectronAPI {
   logError: (message: string, error?: unknown) => Promise<void>;
   listCmdWindows: () => Promise<{ hwnd: string; title: string }[]>;
   sendToTerminal: (hwnd: string, text: string) => Promise<void>;
+  bindTerminal: (hwnd: string) => Promise<boolean>;
+  unbindTerminal: () => Promise<boolean>;
+  onTerminalClosed: (callback: () => void) => (() => void);
 }
 
 declare global {

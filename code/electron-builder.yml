@@ -1,5 +1,5 @@
-appId: com.claudecode.shortcut
-productName: Claude Code Shortcut
+appId: com.zgf.cmdhelper
+productName: zgf的命令行辅助小工具
 directories:
   output: ../release
 files:
@@ -13,12 +13,22 @@ extraResources:
     to: sql-wasm.wasm
   - from: resources
     to: .
+  - from: build/installer.nsh
+    to: .
 extraFiles:
   - from: ../data.db
     to: data.db
 win:
   target:
-    - target: dir
+    - target: nsis
       arch:
         - x64
+  icon: resources/icon.ico
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: zgf的命令行辅助小工具
+  artifactName: zgf-cmd-helper-Setup-${version}.exe
 asar: true

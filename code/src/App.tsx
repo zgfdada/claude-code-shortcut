@@ -24,7 +24,7 @@ function App() {
     updateCommand,
   } = useCommands();
   const { settings, saveSettings, resetSettings } = useSettings();
-  const { boundHwnd, boundTitle, windows, showPicker, setShowPicker, openPicker, bindWindow, unbind, sendText } = useTerminal();
+  const { boundHwnd, boundTitle, windows, showPicker, setShowPicker, openPicker, bindWindow, unbind, sendText, autoUnbound } = useTerminal();
 
   // 发送到终端：先发文本，再无条件记录使用次数
   const handleSendToTerminal = useCallback(async (id: string, text: string) => {
@@ -127,20 +127,20 @@ function App() {
         <div className="flex items-center gap-1" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
           {/* 终端绑定按钮 */}
           <button
-            onClick={boundHwnd ? unbind : openPicker}
+            onClick={() => { void (boundHwnd ? unbind() : openPicker()); }}
             className="px-2 py-0.5 rounded text-xs transition-all duration-150 cursor-pointer"
             style={{
-              color: boundHwnd ? settings.theme.accentColor : `${settings.theme.textColor}55`,
-              backgroundColor: boundHwnd ? `${settings.theme.accentColor}22` : 'transparent',
-              border: `1px solid ${boundHwnd ? settings.theme.accentColor : `${settings.theme.textColor}22`}`,
+              color: boundHwnd ? settings.theme.accentColor : autoUnbound ? '#ff6b6b' : `${settings.theme.textColor}55`,
+              backgroundColor: boundHwnd ? `${settings.theme.accentColor}22` : autoUnbound ? '#ff6b6b22' : 'transparent',
+              border: `1px solid ${boundHwnd ? settings.theme.accentColor : autoUnbound ? '#ff6b6b' : `${settings.theme.textColor}22`}`,
               maxWidth: '120px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
             }}
-            title={boundHwnd ? `已绑定：${boundTitle}，点击解绑` : '绑定 CMD 终端'}
+            title={boundHwnd ? `已绑定：${boundTitle}，点击解绑` : autoUnbound ? '终端已关闭，自动解绑' : '绑定 CMD 终端'}
           >
-            {boundHwnd ? `⬡ ${boundTitle}` : '绑定终端'}
+            {boundHwnd ? `⬡ ${boundTitle}` : autoUnbound ? '终端已关闭' : '绑定终端'}
           </button>
           <button
             onClick={() => window.electronAPI.hideWindow()}
