@@ -11,6 +11,8 @@ files:
 extraResources:
   - from: build/node_modules/sql.js/dist/sql-wasm.wasm
     to: sql-wasm.wasm
+  - from: resources
+    to: .
 extraFiles:
   - from: ../data.db
     to: data.db
