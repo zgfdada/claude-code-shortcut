@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import path from 'path'
+import tailwindcss from 'tailwindcss'
+import autoprefixer from 'autoprefixer'
 
 const rootDir = path.join(__dirname, '../..')
 
@@ -39,6 +41,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(rootDir, 'code/src')
+    }
+  },
+  css: {
+    postcss: {
+      plugins: [
+        tailwindcss(path.join(__dirname, 'tailwind.config.js')),
+        autoprefixer,
+      ]
     }
   },
   base: './',
