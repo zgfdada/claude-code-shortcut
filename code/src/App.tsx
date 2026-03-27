@@ -24,7 +24,7 @@ function App() {
     updateCommand,
   } = useCommands();
   const { settings, saveSettings, resetSettings } = useSettings();
-  const { boundHwnd, boundTitle, windows, showPicker, setShowPicker, openPicker, bindWindow, unbind, sendText, autoUnbound } = useTerminal();
+  const { boundHwnd, boundTitle, windows, showPicker, setShowPicker, openPicker, bindWindow, unbind, sendText, autoUnbound, isFollowing, toggleFollow } = useTerminal();
 
   // 发送到终端：先发文本，再无条件记录使用次数
   const handleSendToTerminal = useCallback(async (id: string, text: string) => {
@@ -142,6 +142,21 @@ function App() {
           >
             {boundHwnd ? `⬡ ${boundTitle}` : autoUnbound ? '终端已关闭' : '绑定终端'}
           </button>
+          {/* 跟随模式按钮 */}
+          {boundHwnd && (
+            <button
+              onClick={() => void toggleFollow()}
+              className="px-2 py-0.5 rounded text-xs transition-all duration-150 cursor-pointer"
+              style={{
+                color: isFollowing ? '#a6e3a1' : `${settings.theme.textColor}55`,
+                backgroundColor: isFollowing ? '#a6e3a122' : 'transparent',
+                border: `1px solid ${isFollowing ? '#a6e3a1' : `${settings.theme.textColor}22`}`,
+              }}
+              title={isFollowing ? '跟随模式已启用：小工具会跟随终端移动' : '启用跟随模式：小工具贴在终端旁边'}
+            >
+              {isFollowing ? '↻ 跟随中' : '☐ 跟随'}
+            </button>
+          )}
           <button
             onClick={() => window.electronAPI.hideWindow()}
             className="w-5 h-5 rounded flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity"

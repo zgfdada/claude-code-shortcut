@@ -11,6 +11,7 @@ export function useTerminal() {
   const [windows, setWindows] = useState<CmdWindow[]>([]);
   const [showPicker, setShowPicker] = useState(false);
   const [autoUnbound, setAutoUnbound] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
   const boundHwndRef = useRef<string | null>(null);
 
   // 保持 ref 同步
@@ -65,6 +66,27 @@ export function useTerminal() {
     await window.electronAPI.sendToTerminal(boundHwnd, text);
   }, [boundHwnd]);
 
+  const enableFollow = useCallback(async () => {
+    if (!boundHwnd) return false;
+    const result = await window.electronAPI.setFollowMode(true);
+    if (result) setIsFollowing(true);
+    return result;
+  }, [boundHwnd]);
+
+  const disableFollow = useCallback(async () => {
+    const result = await window.electronAPI.setFollowMode(false);
+    setIsFollowing(false);
+    return result;
+  }, []);
+
+  const toggleFollow = useCallback(async () => {
+    if (isFollowing) {
+      return await disableFollow();
+    } else {
+      return await enableFollow();
+    }
+  }, [isFollowing, enableFollow, disableFollow]);
+
   return {
     boundHwnd,
     boundTitle,
@@ -76,5 +98,9 @@ export function useTerminal() {
     unbind,
     sendText,
     autoUnbound,
+    isFollowing,
+    enableFollow,
+    disableFollow,
+    toggleFollow,
   };
 }

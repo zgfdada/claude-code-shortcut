@@ -35,10 +35,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   sendToTerminal: (hwnd: string, text: string): Promise<void> => ipcRenderer.invoke('terminal:send', hwnd, text),
   bindTerminal: (hwnd: string): Promise<boolean> => ipcRenderer.invoke('terminal:bind', hwnd),
   unbindTerminal: (): Promise<boolean> => ipcRenderer.invoke('terminal:unbind'),
-  onTerminalClosed: (callback: () => void): void => {
-    ipcRenderer.on('terminal:closed', () => {
-      callback();
-    });
+  setFollowMode: (enable: boolean): Promise<boolean> => ipcRenderer.invoke('terminal:follow', enable),
+  getFollowState: (): Promise<{ isFollowing: boolean; boundHwnd: string | null }> => ipcRenderer.invoke('terminal:getFollowState'),
+  onTerminalClosed: (callback: () => void): (() => void) => {
+    const handler = () => callback();
+    ipcRenderer.on('terminal:closed', handler);
+    return () => ipcRenderer.removeListener('terminal:closed', handler);
   },
 
   // 日志（写入主进程 app.log）

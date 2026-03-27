@@ -54,6 +54,8 @@ export interface ElectronAPI {
   sendToTerminal: (hwnd: string, text: string) => Promise<void>;
   bindTerminal: (hwnd: string) => Promise<boolean>;
   unbindTerminal: () => Promise<boolean>;
+  setFollowMode: (enable: boolean) => Promise<boolean>;
+  getFollowState: () => Promise<{ isFollowing: boolean; boundHwnd: string | null }>;
   onTerminalClosed: (callback: () => void) => (() => void);
 }
 
