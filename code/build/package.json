@@ -2,12 +2,12 @@
   "name": "claude-code-shortcut",
   "version": "1.0.0",
   "description": "Claude Code 命令行快捷工具 - 悬浮置顶、全局热键、智能搜索",
-  "main": "code/build/dist-electron/main.js",
+  "main": "dist-electron/main.js",
   "scripts": {
-    "dev": "node ./code/build/dev.js",
-    "build": "node ./code/build/build.js",
-    "preview": "node ./code/build/preview.js",
-    "electron:dev": "node ./code/build/electron-dev.js"
+    "dev": "vite --config ./vite.config.ts",
+    "build": "node ./build.js",
+    "preview": "vite preview --config ./vite.config.ts",
+    "electron:dev": "vite build --config ./vite.config.ts && electron ."
   },
   "author": "",
   "license": "MIT",

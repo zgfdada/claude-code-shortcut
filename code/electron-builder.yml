@@ -1,0 +1,22 @@
+appId: com.claudecode.shortcut
+productName: Claude Code Shortcut
+directories:
+  output: ../release
+files:
+  - build/dist/**/*
+  - build/dist-electron/**/*
+  - build/node_modules/sql.js/**/*
+  - build/node_modules/koffi/**/*
+  - ../data.db
+extraResources:
+  - from: build/node_modules/sql.js/dist/sql-wasm.wasm
+    to: sql-wasm.wasm
+extraFiles:
+  - from: ../data.db
+    to: data.db
+win:
+  target:
+    - target: dir
+      arch:
+        - x64
+asar: true
