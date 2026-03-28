@@ -1,5 +1,36 @@
 # Claude Code Shortcut 开发文档
 
+## 从 GitHub 构建项目
+
+### 1. 克隆仓库
+
+```bash
+git clone https://github.com/zgfdada/claude-code-shortcut.git
+cd claude-code-shortcut
+```
+
+### 2. 安装依赖
+
+```bash
+npm install
+```
+
+### 3. 开发模式运行
+
+```bash
+npm run dev
+```
+
+### 4. 构建生产版本
+
+```bash
+npm run build
+```
+
+构建完成后，可执行文件位于 `release/win-unpacked/` 目录。
+
+---
+
 ## 项目概述
 
 Claude Code Shortcut 是一款基于 Electron + React + TypeScript 的 Windows 桌面应用，用于管理和快速发送命令到终端窗口。

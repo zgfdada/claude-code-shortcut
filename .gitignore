@@ -31,3 +31,8 @@ Thumbs.db
 # Test files
 test-*.js
 tests/
+
+# Claude Code
+.claude/
+CLAUDE.md
+memory/
