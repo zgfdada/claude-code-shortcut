@@ -45,13 +45,15 @@ export function useTerminal() {
   }, [refreshWindows]);
 
   const bindWindow = useCallback(async (w: CmdWindow) => {
+    // Bug 1 修复：如果之前是跟随状态，绑定新终端时自动恢复跟随
+    const wasFollowing = isFollowing;
     setBoundHwnd(w.hwnd);
     setBoundTitle(w.title);
     setShowPicker(false);
     setAutoUnbound(false);
-    // 通知主进程开始监控
-    await window.electronAPI.bindTerminal(w.hwnd);
-  }, []);
+    // 通知主进程开始监控，如果之前是跟随状态则自动恢复
+    await window.electronAPI.bindTerminal(w.hwnd, wasFollowing);
+  }, [isFollowing]);
 
   const unbind = useCallback(async () => {
     setBoundHwnd(null);

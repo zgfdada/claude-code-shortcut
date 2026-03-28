@@ -1,6 +1,6 @@
 {
   "name": "claude-code-shortcut-code",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Source code directory",
   "author": "",
   "main": "build/dist-electron/main.js",

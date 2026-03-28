@@ -52,7 +52,7 @@ export interface ElectronAPI {
   logError: (message: string, error?: unknown) => Promise<void>;
   listCmdWindows: () => Promise<{ hwnd: string; title: string }[]>;
   sendToTerminal: (hwnd: string, text: string) => Promise<void>;
-  bindTerminal: (hwnd: string) => Promise<boolean>;
+  bindTerminal: (hwnd: string, autoEnableFollow?: boolean) => Promise<boolean>;
   unbindTerminal: () => Promise<boolean>;
   setFollowMode: (enable: boolean) => Promise<boolean>;
   getFollowState: () => Promise<{ isFollowing: boolean; boundHwnd: string | null }>;

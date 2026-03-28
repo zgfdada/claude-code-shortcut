@@ -33,7 +33,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 终端绑定
   listCmdWindows: (): Promise<{ hwnd: string; title: string }[]> => ipcRenderer.invoke('terminal:list'),
   sendToTerminal: (hwnd: string, text: string): Promise<void> => ipcRenderer.invoke('terminal:send', hwnd, text),
-  bindTerminal: (hwnd: string): Promise<boolean> => ipcRenderer.invoke('terminal:bind', hwnd),
+  bindTerminal: (hwnd: string, autoEnableFollow?: boolean): Promise<boolean> => ipcRenderer.invoke('terminal:bind', hwnd, autoEnableFollow),
   unbindTerminal: (): Promise<boolean> => ipcRenderer.invoke('terminal:unbind'),
   setFollowMode: (enable: boolean): Promise<boolean> => ipcRenderer.invoke('terminal:follow', enable),
   getFollowState: (): Promise<{ isFollowing: boolean; boundHwnd: string | null }> => ipcRenderer.invoke('terminal:getFollowState'),

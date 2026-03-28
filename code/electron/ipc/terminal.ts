@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow } from 'electron';
-import { enumCmdWindows, sendTextToCmd, isWindowValid, positionWindowBeside, isWindowMinimized } from '../winApi';
+import { enumCmdWindows, sendTextToCmd, isWindowValid, positionWindowBeside, isWindowMinimized, isWindowForeground } from '../winApi';
 import log from 'electron-log';
 
 // 主进程缓存 hwnd 对象，renderer 只传 hwndStr 作为 key
@@ -103,6 +103,21 @@ function updateFollowPosition(): void {
       mainWindow.show();
       log.info('[terminal] 跟随模式：终端恢复，小工具同步显示');
     }
+
+    // Bug 2 修复：当终端获得焦点时，工具窗口临时置顶；失去焦点时取消置顶
+    const isForeground = isWindowForeground(hwnd);
+    const isAlwaysOnTop = mainWindow.isAlwaysOnTop();
+
+    if (isForeground && !isAlwaysOnTop) {
+      // 终端获得焦点，工具窗口置顶以确保可见
+      mainWindow.setAlwaysOnTop(true);
+      log.info('[terminal] 跟随模式：终端获得焦点，工具窗口置顶');
+    } else if (!isForeground && isAlwaysOnTop) {
+      // 终端失去焦点，工具窗口取消置顶（与终端同层）
+      mainWindow.setAlwaysOnTop(false);
+      log.info('[terminal] 跟随模式：终端失去焦点，工具窗口取消置顶');
+    }
+
     // 更新位置（间隙为0）
     positionWindowBeside(hwnd, mainWindow, 0);
   }
@@ -174,10 +189,17 @@ export function registerTerminalHandlers(): void {
   });
 
   // 绑定窗口时开始监控
-  ipcMain.handle('terminal:bind', async (_event, hwndStr: string) => {
+  ipcMain.handle('terminal:bind', async (_event, hwndStr: string, autoEnableFollow: boolean = false) => {
     boundHwndStr = hwndStr;
-    log.info(`[terminal] 绑定终端: ${hwndStr}`);
+    log.info(`[terminal] 绑定终端: ${hwndStr}, autoEnableFollow=${autoEnableFollow}`);
     startChecking();
+
+    // Bug 1 修复：如果前端请求自动启用跟随（之前是跟随状态），则恢复跟随
+    if (autoEnableFollow) {
+      log.info('[terminal] 自动恢复跟随模式');
+      startFollowing();
+    }
+
     return true;
   });
 

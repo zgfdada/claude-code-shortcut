@@ -16,6 +16,7 @@ const IsWindow = user32.func('bool IsWindow(void* hWnd)');
 const GetWindowRect = user32.func('bool GetWindowRect(void* hWnd, _Out_ int32_t* lpRect)');
 const SetWindowPos = user32.func('bool SetWindowPos(void* hWnd, void* hWndInsertAfter, int X, int Y, int cx, int cy, uint32_t uFlags)');
 const IsIconic = user32.func('bool IsIconic(void* hWnd)');
+const GetForegroundWindow = user32.func('void* GetForegroundWindow()');
 
 // SetWindowPos 标志
 const SWP_NOSIZE = 0x0001;
@@ -143,6 +144,17 @@ export function isWindowMinimized(hwnd: object): boolean {
     return IsIconic(hwnd) as boolean;
   } catch (error) {
     log.error('[winApi] IsIconic 检查失败:', error);
+    return false;
+  }
+}
+
+export function isWindowForeground(hwnd: object): boolean {
+  try {
+    const foregroundHwnd = GetForegroundWindow() as object;
+    const isForeground = koffi.address(foregroundHwnd) === koffi.address(hwnd);
+    return isForeground;
+  } catch (error) {
+    log.error('[winApi] GetForegroundWindow 检查失败:', error);
     return false;
   }
 }
