@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { Command, Settings } from '../src/types';
+import type { Command, Settings, TerminalCapabilities } from '../src/types';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // 命令相关
@@ -31,6 +31,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 
   // 终端绑定
+  getTerminalCapabilities: (): Promise<TerminalCapabilities> => ipcRenderer.invoke('terminal:getCapabilities'),
   listCmdWindows: (): Promise<{ hwnd: string; title: string }[]> => ipcRenderer.invoke('terminal:list'),
   sendToTerminal: (hwnd: string, text: string): Promise<void> => ipcRenderer.invoke('terminal:send', hwnd, text),
   bindTerminal: (hwnd: string, autoEnableFollow?: boolean): Promise<boolean> => ipcRenderer.invoke('terminal:bind', hwnd, autoEnableFollow),

@@ -4,7 +4,7 @@ import log from 'electron-log';
 import { initDatabase, getSettings, saveSettings, setDbDir } from './database';
 import { registerCommandsHandlers } from './ipc/commands';
 import { registerSettingsHandlers } from './ipc/settings';
-import { registerTerminalHandlers } from './ipc/terminal';
+import { registerTerminalHandlers, cleanupTerminalHandlers } from './ipc/terminal';
 import { createTray, destroyTray } from './tray';
 import { registerGlobalShortcut, unregisterAllShortcuts } from './globalShortcut';
 
@@ -201,6 +201,7 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
   (app as typeof app & { isQuitting: boolean }).isQuitting = true;
   unregisterAllShortcuts();
+  void cleanupTerminalHandlers();
   destroyTray();
   log.info('应用正在退出...');
 });

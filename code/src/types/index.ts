@@ -34,6 +34,20 @@ export interface Settings {
   categoryColors: Record<string, string>;
 }
 
+export interface TerminalWindow {
+  hwnd: string;
+  title: string;
+}
+
+export interface TerminalCapabilities {
+  supported: boolean;
+  canListWindows: boolean;
+  canBind: boolean;
+  canSendText: boolean;
+  canFollow: boolean;
+  reason?: string;
+}
+
 export interface ElectronAPI {
   getCommands: () => Promise<Command[]>;
   searchCommands: (query: string) => Promise<Command[]>;
@@ -50,7 +64,8 @@ export interface ElectronAPI {
   onThemeUpdate: (callback: (settings: Settings) => void) => void;
   logInfo: (message: string) => Promise<void>;
   logError: (message: string, error?: unknown) => Promise<void>;
-  listCmdWindows: () => Promise<{ hwnd: string; title: string }[]>;
+  getTerminalCapabilities: () => Promise<TerminalCapabilities>;
+  listCmdWindows: () => Promise<TerminalWindow[]>;
   sendToTerminal: (hwnd: string, text: string) => Promise<void>;
   bindTerminal: (hwnd: string, autoEnableFollow?: boolean) => Promise<boolean>;
   unbindTerminal: () => Promise<boolean>;

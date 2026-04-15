@@ -1,5 +1,6 @@
 appId: com.zgf.cmdhelper
 productName: zgf的命令行辅助小工具
+electronVersion: 29.1.4
 directories:
   output: ../release
 files:
@@ -23,7 +24,19 @@ win:
     - target: nsis
       arch:
         - x64
-  icon: resources/icon.ico
+  icon: resources/icons/icon.ico
+  signAndEditExecutable: false
+mac:
+  target:
+    - dmg
+    - zip
+  icon: resources/icons/icon.icns
+  category: public.app-category.developer-tools
+linux:
+  target:
+    - AppImage
+  icon: resources/icons
+  category: Development
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
