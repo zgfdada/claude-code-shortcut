@@ -37,6 +37,8 @@ linux:
     - AppImage
   icon: resources/icons
   category: Development
+  executableArgs:
+    - --no-sandbox
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true

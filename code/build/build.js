@@ -4,13 +4,16 @@
  */
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { execSync } = require('child_process');
 
 const buildDir = __dirname;  // code/build
+const codeDir = path.join(buildDir, '..');
 const root = path.join(buildDir, '..', '..');  // 项目根目录
 const projectDb = path.join(root, 'data.db');
 const rootNodeModules = path.join(root, 'node_modules');
 const buildNodeModules = path.join(buildDir, 'node_modules');
+const linuxNoSandboxHook = path.join(buildDir, 'after-pack-linux-no-sandbox.cjs');
 
 function ensureBuildDependency(name) {
   const sourceDir = path.join(rootNodeModules, name);
@@ -24,6 +27,38 @@ function ensureBuildDependency(name) {
   fs.mkdirSync(path.dirname(targetDir), { recursive: true });
   fs.cpSync(sourceDir, targetDir, { recursive: true });
   console.log(`[build] 已同步依赖 ${name} → ${targetDir}`);
+}
+
+function writeLinuxNoSandboxHook() {
+  const hookSource = `const fs = require('fs');
+const path = require('path');
+
+async function afterPack(context) {
+  if (context.electronPlatformName !== 'linux') {
+    return;
+  }
+
+  const executableName = context.packager.executableName;
+  const appOutDir = context.appOutDir;
+  const executablePath = path.join(appOutDir, executableName);
+  const originalPath = path.join(appOutDir, executableName + '-bin');
+
+  if (!fs.existsSync(executablePath)) {
+    throw new Error('[afterPack] 未找到 Linux 可执行文件: ' + executablePath);
+  }
+
+  fs.rmSync(originalPath, { force: true });
+  fs.renameSync(executablePath, originalPath);
+
+  fs.writeFileSync(executablePath, '#!/bin/sh\\nexec "$(dirname "$0")/' + path.basename(originalPath) + '" --no-sandbox "$@"\\n');
+  fs.chmodSync(executablePath, 0o755);
+}
+
+module.exports = { afterPack };
+`;
+
+  fs.writeFileSync(linuxNoSandboxHook, hookSource);
+  console.log('[build] 已生成 Linux afterPack hook →', linuxNoSandboxHook);
 }
 
 if (!fs.existsSync(projectDb)) {
@@ -40,8 +75,14 @@ execSync('npx vite build', { stdio: 'inherit', cwd: buildDir });
 fs.mkdirSync(buildNodeModules, { recursive: true });
 ensureBuildDependency('sql.js');
 ensureBuildDependency('koffi');
+writeLinuxNoSandboxHook();
 
 // 执行 electron-builder（从 code/ 目录运行，加载 code/electron-builder.yml）
 console.log('[build] 打包应用...');
-const codeDir = path.join(root, 'code');
-execSync('npx electron-builder', { stdio: 'inherit', cwd: codeDir });
+const afterPackPath = path.relative(codeDir, linuxNoSandboxHook).split(path.sep).join('/');
+const afterPackArg = os.platform() === 'win32' ? afterPackPath.replace(/"/g, '\\"') : `'${afterPackPath.replace(/'/g, `'"'"'`)}'`;
+try {
+  execSync(`npx electron-builder --config.afterPack=${afterPackArg}`, { stdio: 'inherit', cwd: codeDir });
+} finally {
+  fs.rmSync(linuxNoSandboxHook, { force: true });
+}

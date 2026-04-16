@@ -10,6 +10,34 @@ let db: SqlJsDatabase;
 let dbPath: string;
 let dbDir: string;
 
+export function getRuntimeDataDir(): string {
+  if (!app.isPackaged) {
+    return path.join(__dirname, '..');
+  }
+
+  if (process.platform === 'linux' && process.env.APPIMAGE) {
+    return path.dirname(process.env.APPIMAGE);
+  }
+
+  return path.dirname(process.execPath);
+}
+
+function copyBundledDatabaseIfNeeded(targetPath: string): void {
+  const bundledDbPath = path.join(path.dirname(process.execPath), 'data.db');
+  const targetHasData = fs.existsSync(targetPath) && fs.statSync(targetPath).size > 0;
+
+  if (bundledDbPath === targetPath || targetHasData || !fs.existsSync(bundledDbPath)) {
+    return;
+  }
+
+  if (fs.statSync(bundledDbPath).size === 0) {
+    return;
+  }
+
+  fs.copyFileSync(bundledDbPath, targetPath);
+  log.info(`已复制初始数据库：${bundledDbPath} -> ${targetPath}`);
+}
+
 export function setDbDir(dir: string): void {
   dbDir = dir;
 }
@@ -45,9 +73,14 @@ function saveDatabase(): void {
 }
 
 export async function initDatabase(): Promise<void> {
-  // 使用 main.ts 设置的目录，fallback 到 exe 同级
-  const dir = dbDir || (app.isPackaged ? path.dirname(process.execPath) : path.join(__dirname, '..'));
+  // 使用 main.ts 设置的目录，fallback 到运行时可写目录
+  const dir = dbDir || getRuntimeDataDir();
+  fs.mkdirSync(dir, { recursive: true });
   dbPath = path.join(dir, 'data.db');
+
+  if (app.isPackaged && process.platform === 'linux') {
+    copyBundledDatabaseIfNeeded(dbPath);
+  }
 
   log.info(`正在初始化数据库：${dbPath}`);
 

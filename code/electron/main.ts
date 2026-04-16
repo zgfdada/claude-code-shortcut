@@ -1,19 +1,23 @@
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'path';
 import log from 'electron-log';
-import { initDatabase, getSettings, saveSettings, setDbDir } from './database';
+import { getRuntimeDataDir, initDatabase, getSettings, saveSettings, setDbDir } from './database';
 import { registerCommandsHandlers } from './ipc/commands';
 import { registerSettingsHandlers } from './ipc/settings';
 import { registerTerminalHandlers, cleanupTerminalHandlers } from './ipc/terminal';
 import { createTray, destroyTray } from './tray';
 import { registerGlobalShortcut, unregisterAllShortcuts } from './globalShortcut';
 
+if (process.platform === 'linux' && app.isPackaged) {
+  app.commandLine.appendSwitch('no-sandbox');
+}
+
 // 禁用硬件加速，避免某些 Windows 系统上的问题
 app.disableHardwareAcceleration();
 
-// 配置日志路径到 exe 同级目录（必须在 app ready 前设置路径变量，但实际写入在 ready 后）
-const appDir = app.isPackaged ? path.dirname(process.execPath) : path.join(__dirname, '..');
-log.transports.file.resolvePathFn = () => path.join(appDir, 'app.log');
+// 配置日志路径到可写目录（必须在 app ready 前设置路径变量，但实际写入在 ready 后）
+const dataDir = getRuntimeDataDir();
+log.transports.file.resolvePathFn = () => path.join(dataDir, 'app.log');
 log.transports.file.level = 'info';
 log.transports.console.level = 'debug';
 log.info('应用启动中...');
@@ -153,9 +157,9 @@ app.whenReady().then(async () => {
   log.info('应用已就绪');
 
   try {
-    // 初始化数据库（存储在 exe 同级目录，重建前由构建脚本备份）
-    setDbDir(appDir);
-    log.info(`数据库目录：${appDir}`);
+    // 初始化数据库（Windows 保持 exe 同级，Linux AppImage 使用 AppImage 同级目录）
+    setDbDir(dataDir);
+    log.info(`数据库目录：${dataDir}`);
     await initDatabase();
 
     // 注册 IPC 处理器
