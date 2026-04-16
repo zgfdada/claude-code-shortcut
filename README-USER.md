@@ -150,6 +150,17 @@ chmod +x "zgf的命令行辅助小工具-1.0.1.AppImage"
 - 备份时请一并保存 `data.db`
 - 升级版本时，如需保留原有数据，请将旧版本中的 `data.db` 复制到新版本对应目录
 
+## Linux AppImage 分发
+
+如果你要把程序发给另一台 **x86_64 Linux** 机器：
+
+- 只需要对方能运行时，通常只需要提供 `.AppImage`
+- 如果还要保留当前命令和设置，请同时提供同目录的 `data.db`
+- 一般不需要附带 `app.log`、`linux-unpacked/`、`release-upload/`、源码目录或 `node_modules/`
+- 对方首次运行前需要执行：`chmod +x <AppImage>`
+- 对方系统通常需要安装 `libfuse2` 或 `libfuse2t64`
+- 请将 AppImage 放在可写目录中运行，因为程序会在同目录读写 `data.db` 和 `app.log`
+
 ## 常见问题
 
 ### 为什么 Linux / macOS 上“绑定终端”按钮是灰色的？

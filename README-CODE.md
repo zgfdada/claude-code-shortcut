@@ -215,6 +215,21 @@ npm run preview
 - 不要把调试过程中生成的 `app.log` 一起发布
 - 如果不希望分发个人命令数据，请在打包前替换为干净的 `data.db`
 
+## Linux AppImage 分发说明
+
+面向其他 **x86_64 Linux** 设备分发时：
+
+- 如果只需要对方“能运行程序”，通常只需要交付 `zgf的命令行辅助小工具-<version>.AppImage`
+- 如果需要一并保留当前命令、收藏、主题等数据，还需要同时交付同目录的 `data.db`
+- 一般不需要附带 `app.log`、`linux-unpacked/`、`release-upload/`、源码目录或 `node_modules/`
+
+接收方环境需要满足：
+
+1. 首次运行前给 AppImage 添加执行权限：`chmod +x <AppImage>`
+2. 系统具备 FUSE 兼容库：`libfuse2` 或 `libfuse2t64`
+3. 将 AppImage 放在**可写目录**中运行，因为程序会在同目录读写 `data.db` 和 `app.log`
+4. 目标机器为 `x86_64 Linux`；ARM 设备不能直接复用当前产物
+
 ## 终端实现说明（Windows）
 
 Windows 终端能力依赖 `code/electron/winApi.ts`，主要使用：
